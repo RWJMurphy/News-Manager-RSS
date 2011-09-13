@@ -7,8 +7,8 @@ Author: Reed Murphy
 Author URI: http://www.reedmurphy.net/
 */
 
+define('NMRSS_CONFIG_XML', GSDATAOTHERPATH .'nmrss_config.xml');
 define('NMRSS_TAG', '[newsrss]');
-define('NMRSS_POSTS_IN_FEED', 10);
 
 $thisfile = basename(__FILE__, ".php");
 register_plugin(
@@ -19,61 +19,145 @@ register_plugin(
     'http://www.reedmurphy.net/', //author website
     '', //Plugin description
     'pages', //page type - on which admin tab to display
-    'news_manager_rss_admin'  //main function (administration)
+    'nmrss_admin'  //main function (administration)
 );
 
-add_filter('content', 'news_manager_rss_filter');
+add_filter('content', 'nmrss_filter');
 add_action('pages-sidebar','createSideMenu',array($thisfile,'News Manager RSS Settings'));
+add_action('theme-header', 'nmrss_header');
 
 require_once('news_manager/inc/common.php');
 
-function news_manager_rss_admin() {
-    echo "<p>Eventually, options go here.</p>";
+function nmrss_read_config() {
+    $config = array();
+    if (file_exists(NMRSS_CONFIG_XML)) {
+        $x = getXML(NMRSS_CONFIG_XML);
+        $config['post_count'] = (int)$x->post_count;
+        $config['url'] = strval($x->url);
+    } else {
+        $config['post_count'] = 10;
+        $config['url'] = '';
+    }
+    return $config;
 }
 
-function news_manager_rss_filter($content) {
-    if (strpos($content, NMRSS_TAG) !== FALSE) {
-       $content = render_rss_feed();
+function nmrss_write_config($config) {
+    $xml = @new SimpleXMLElement('<item></item>');
+    $xml->addChild('post_count', $config['post_count']);
+    $xml->addChild('url', $config['url']);
+
+    return $xml->asXML(NMRSS_CONFIG_XML);
+}
+
+function nmrss_admin() {
+    $config = nmrss_read_config();
+    $error = "";
+    $success = "";
+
+	if (isset($_POST['submit'])) {
+		if ($_POST['post_count'] != '') {
+			if (is_numeric($_POST['post_count']) && (int)$_POST['post_count'] == $_POST['post_count'] and (int)$_POST['post_count'] > 0) {
+				$config['post_count'] = $_POST['post_count'];
+			} else {
+				$error .= 'Post count must be a whole number.';
+			}
+		}
+
+        $config['url'] = $_POST['url'];
+		
+		if ($error == "") {
+			if (! nmrss_write_config($config)) {
+				$error = i18n_r('CHMOD_ERROR');
+			} else {
+                $config = nmrss_read_config();
+				$success = i18n_r('SETTINGS_UPDATED');
+			}
+		}
+	}
+	?>
+	<h3>News Manager RSS Settings</h3>
+	
+	<?php 
+	if($success) { 
+		echo '<p style="color:#669933;"><b>'. $success .'</b></p>';
+	} 
+	if($error) { 
+		echo '<p style="color:#cc0000;"><b>'. $error .'</b></p>';
+	}
+	?>
+	
+	<form method="post" action="<?php echo $_SERVER ['REQUEST_URI']?>">
+        <p>
+            <label for="nmrss_url">Page to display RSS feed</label>
+            <select name="url" id="nmrss_url">
+<?php
+    $pages = get_available_pages();
+    foreach ($pages as $page) {
+        $slug = $page['slug'];
+        if ($slug == $config['url']) {
+            echo "<option value=\"$slug\" selected=\"selected\">$slug</option>\n";
+        } else {
+            echo "<option value=\"$slug\">$slug</option>\n";
+        }
+    }
+?>
+            </select>
+        </p>
+		<p><label for="nmrss_post_count" >Number of posts to display in feed</label><input id="nmrss_post_count" name="post_count" class="text" value="<?php echo $config['post_count']; ?>" /></p>
+		<p><input type="submit" id="submit" class="submit" value="<?php i18n('BTN_SAVESETTINGS'); ?>" name="submit" /></p>
+	</form>
+	
+	<?php
+}
+
+function nmrss_header() {
+    global $SITEURL;
+    $config = nmrss_read_config();
+    echo '<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="' . $SITEURL . $config['url'] ."\" />\n";
+}
+
+function nmrss_filter($content) {
+    $config = nmrss_read_config();
+    if ($config['url'] == get_page_slug(false)) {
+       $content = nmrss_render_feed();
     }
     return $content;
 }
 
-function render_rss_feed() {
-    $rss .= "<rss version=\"2.0\">\n";
-    $rss .= "<channel>\n";
-
+function nmrss_render_feed() {
+    $config = nmrss_read_config();
     $posts = nm_get_posts();
-    $pages = array_chunk($posts, NMRSS_POSTS_IN_FEED, true);
+    $pages = array_chunk($posts, $config['post_count'], true);
     $posts = $pages[0];
+
+    $rss = "";
 
     if (!empty($posts)) {
         foreach ($posts as $post) {
             $rss .= nmrss_render_post($post->slug);
         }
     }
-
-    $rss .= "</channel>\n";
-    $rss .= "</rss>\n";
     return $rss;
 }
 
 function nmrss_render_post($slug) {
+    $rss_item = "";
     $file = NMPOSTPATH . "$slug.xml";
     $post = @getXML($file);
     if (!empty($post) && $post->private != 'Y') {
         $url     = nm_get_url('post') . $slug;
         $title   = strip_tags(strip_decode($post->title));
-        $date    = nm_get_date(i18n_r('news_manager/DATE_FORMAT'), strtotime($post->date));
+        $date    = date("D, d M Y H:i:s O", strtotime($post->date));
         $content = strip_decode($post->content);
-    }
 
-    $rss_item  = "<item>\n";
-    $rss_item .= "<title>$title</title>\n";
-    $rss_item .= "<link>$url</link>\n";
-    $rss_item .= "<guid>$url</guid>\n";
-    $rss_item .= "<pubDate>$date</pubDate>\n";
-    $rss_item .= "<description><![CDATA[ $content ]]></description>\n";
-    $rss_item .= "</item>\n";
+        $rss_item .= "\t\t\t<item>\n";
+        $rss_item .= "\t\t\t\t<title>$title</title>\n";
+        $rss_item .= "\t\t\t\t<link>$url</link>\n";
+        $rss_item .= "\t\t\t\t<guid>$url</guid>\n";
+        $rss_item .= "\t\t\t\t<pubDate>$date</pubDate>\n";
+        $rss_item .= "\t\t\t\t<description><![CDATA[ $content ]]></description>\n";
+        $rss_item .= "\t\t\t</item>\n";
+    }
 
     return $rss_item;
 }
