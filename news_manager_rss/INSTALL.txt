@@ -1,0 +1,7 @@
+News Manager RSS plugin installation
+====================================
+
+1. Extract the zip file into your GetSimple plugins/ directory
+2. Copy themefiles/rss.php into your current theme
+3. Create a new page to be your RSS feed, and set it to use the rss.php template
+4. In "News Manager RSS Settings", set your newly created page as the RSS feed page
