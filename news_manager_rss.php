@@ -35,8 +35,9 @@ function nmrss_read_config() {
         $config['post_count'] = (int)$x->post_count;
         $config['url'] = strval($x->url);
     } else {
+        # Default config options
         $config['post_count'] = 10;
-        $config['url'] = '';
+        $config['url'] = 'rss';
     }
     return $config;
 }
