@@ -2,7 +2,7 @@
 /*
 Plugin Name: News Manager RSS
 Description: Adds RSS functionality to News Manager
-Version: 1.0
+Version: 1.0.1
 Author: Reed Murphy
 Author URI: http://www.reedmurphy.net/
 */
@@ -14,7 +14,7 @@ $thisfile = basename(__FILE__, ".php");
 register_plugin(
     $thisfile, //Plugin id
     'News Manager RSS',  //Plugin name
-    '1.0',      //Plugin version
+    '1.0.1',      //Plugin version
     'Reed Murphy',  //Plugin author
     'http://www.reedmurphy.net/', //author website
     '', //Plugin description
@@ -146,10 +146,10 @@ function nmrss_render_post($slug) {
     $file = NMPOSTPATH . "$slug.xml";
     $post = @getXML($file);
     if (!empty($post) && $post->private != 'Y') {
-        $url     = nm_get_url('post') . $slug;
-        $title   = strip_tags(strip_decode($post->title));
+        $url     = htmlspecialchars(nm_get_url('post') . $slug, ENT_QUOTES, 'UTF-8');
+        $title   = htmlspecialchars(html_entity_decode($post->title, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8');
         $date    = date("D, d M Y H:i:s O", strtotime($post->date));
-        $content = strip_decode($post->content);
+        $content = str_replace("]]>", "]]]]><![CDATA[>", html_entity_decode(html_entity_decode($post->content, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8'));
 
         $rss_item .= "\t\t\t<item>\n";
         $rss_item .= "\t\t\t\t<title>$title</title>\n";

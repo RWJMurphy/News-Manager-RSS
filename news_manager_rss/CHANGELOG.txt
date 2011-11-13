@@ -1,0 +1,11 @@
+Version 1.0.1 (November 2011)
+=============
+    * Added MIT license
+    * Content escaping / encoding fixes
+        * <description> no longer uses XML-encoded entities - the content is UTF-8 wrapped in CDATA
+        * <title> is UTF-8 with HTML special characters encoded
+        * <link> / <guid> encode HTML special characters
+
+Version 1.0 (September 2011)
+===========
+    * Initial release
