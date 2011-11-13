@@ -1,0 +1,9 @@
+News Manager RSS plugin for GetSimple CMS
+=========================================
+Copyright (c) 2011 Reed Murphy <reed@reedmurphy.net>
+
+Version 1.0.1 -
+    * DonR - URL encoding bugfix
+
+Version 1.0 - September 2011
+    * Reed Murphy
