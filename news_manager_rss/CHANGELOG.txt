@@ -1,3 +1,7 @@
+Version 1.0.2 (December 2011)
+=============
+    * Fixed an issue with quotes on attributes remaining escaped when magic_quotes_gpc is on
+
 Version 1.0.1 (November 2011)
 =============
     * Added MIT license
