@@ -2,7 +2,7 @@
 /*
 Plugin Name: News Manager RSS
 Description: Adds RSS functionality to News Manager
-Version: 1.0.1
+Version: 1.0.2
 Author: Reed Murphy
 Author URI: http://www.reedmurphy.net/
 */
@@ -14,7 +14,7 @@ $thisfile = basename(__FILE__, ".php");
 register_plugin(
     $thisfile, //Plugin id
     'News Manager RSS',  //Plugin name
-    '1.0.1',      //Plugin version
+    '1.0.2',      //Plugin version
     'Reed Murphy',  //Plugin author
     'http://www.reedmurphy.net/', //author website
     '', //Plugin description
