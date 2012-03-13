@@ -8,7 +8,6 @@ Author URI: http://www.reedmurphy.net/
 */
 
 define('NMRSS_CONFIG_XML', GSDATAOTHERPATH .'nmrss_config.xml');
-define('NMRSS_TAG', '[newsrss]');
 
 $thisfile = basename(__FILE__, ".php");
 register_plugin(
@@ -26,7 +25,7 @@ add_filter('content', 'nmrss_filter');
 add_action('pages-sidebar','createSideMenu',array($thisfile,'News Manager RSS Settings'));
 add_action('theme-header', 'nmrss_header');
 
-require_once('news_manager/inc/common.php');
+require_once(GSROOTPATH . 'plugins/news_manager/inc/common.php');
 
 function nmrss_read_config() {
     $config = array();
@@ -114,7 +113,8 @@ function nmrss_admin() {
 function nmrss_header() {
     global $SITEURL;
     $config = nmrss_read_config();
-    echo '<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="' . $SITEURL . $config['url'] ."\" />\n";
+    $url = find_url($config['url'], '');
+    echo '<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="'. $url ."\" />\n";
 }
 
 function nmrss_filter($content) {
