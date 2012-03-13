@@ -1,3 +1,9 @@
+Version 1.0.3 (March 2012)
+=============
+    * Fixed RSS link href on sites that are not using Fancy URLs
+    * Fixed RSS template (rss.php) using XML-encoded entites for <title> / <description>
+    * Fixed edge case where including of NewsManager functions would fail
+
 Version 1.0.2 (December 2011)
 =============
     * Fixed an issue with quotes on attributes remaining escaped when magic_quotes_gpc is on
