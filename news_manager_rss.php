@@ -8,6 +8,7 @@ Author URI: http://www.reedmurphy.net/
 */
 
 define('NMRSS_CONFIG_XML', GSDATAOTHERPATH .'nmrss_config.xml');
+define('FEEDBURNER_URL', "http://feeds.feedburner.com/");
 
 $thisfile = basename(__FILE__, ".php");
 register_plugin(
@@ -33,10 +34,12 @@ function nmrss_read_config() {
         $x = getXML(NMRSS_CONFIG_XML);
         $config['post_count'] = (int)$x->post_count;
         $config['url'] = strval($x->url);
+        $config['feedburner_id'] = strval($x->feedburner_id);
     } else {
         # Default config options
         $config['post_count'] = 10;
         $config['url'] = 'rss';
+        $config['feedburner_id'] = '';
     }
     return $config;
 }
@@ -45,6 +48,7 @@ function nmrss_write_config($config) {
     $xml = @new SimpleXMLElement('<item></item>');
     $xml->addChild('post_count', $config['post_count']);
     $xml->addChild('url', $config['url']);
+    $xml->addChild('feedburner_id', $config['feedburner_id']);
 
     return $xml->asXML(NMRSS_CONFIG_XML);
 }
@@ -64,6 +68,7 @@ function nmrss_admin() {
 		}
 
         $config['url'] = $_POST['url'];
+        $config['feedburner_id'] = $_POST['feedburner_id'];
 		
 		if ($error == "") {
 			if (! nmrss_write_config($config)) {
@@ -104,6 +109,7 @@ function nmrss_admin() {
             </select>
         </p>
 		<p><label for="nmrss_post_count" >Number of posts to display in feed</label><input id="nmrss_post_count" name="post_count" class="text" value="<?php echo $config['post_count']; ?>" /></p>
+		<p><label for="nmrss_feedburner_id" ><em>Optional</em>: <a href="http://feedburner.google.com">FeedBurner</a> Feed ID</label><input id="nmrss_feedburner_id" name="feedburner_id" class="text" value="<?php echo $config['feedburner_id']; ?>" /></p>
 		<p><input type="submit" id="submit" class="submit" value="<?php i18n('BTN_SAVESETTINGS'); ?>" name="submit" /></p>
 	</form>
 	
@@ -120,7 +126,13 @@ function nmrss_header() {
 function nmrss_filter($content) {
     $config = nmrss_read_config();
     if ($config['url'] == get_page_slug(false)) {
-       $content = nmrss_render_feed();
+        if ($config['feedburner_id'] != '') {
+            if (!preg_match("/FeedBurner/", $_SERVER['HTTP_USER_AGENT'])) {
+                redirect(FEEDBURNER_URL . $config['feedburner_id']);
+                exit;
+            }
+        }
+        $content = nmrss_render_feed();
     }
     return $content;
 }

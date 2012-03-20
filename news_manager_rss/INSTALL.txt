@@ -5,3 +5,7 @@ News Manager RSS plugin installation
 2. Copy themefiles/rss.php into your current theme
 3. Create a new page to be your RSS feed, and set it to use the rss.php template
 4. In "News Manager RSS Settings", set your newly created page as the RSS feed page
+5. *Optional*: If you have FeedBurner configured on your RSS feed, you can set
+  your FeedBurner feed ID (the bit after `http://feeds.feedburner.com/` in your
+  FeedBurner URL) as well, and requests for your site's feed will be redirected
+  to FeedBurner.
