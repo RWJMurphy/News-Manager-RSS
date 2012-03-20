@@ -1,21 +1,25 @@
+Version 1.1.0 (March 2012)
+=============
+* Added FeedBurner support
+
 Version 1.0.3 (March 2012)
 =============
-    * Fixed RSS link href on sites that are not using Fancy URLs
-    * Fixed RSS template (rss.php) using XML-encoded entites for <title> / <description>
-    * Fixed edge case where including of NewsManager functions would fail
+* Fixed RSS link href on sites that are not using Fancy URLs
+* Fixed RSS template (rss.php) using XML-encoded entites for <title> / <description>
+* Fixed edge case where including of NewsManager functions would fail
 
 Version 1.0.2 (December 2011)
 =============
-    * Fixed an issue with quotes on attributes remaining escaped when magic_quotes_gpc is on
+* Fixed an issue with quotes on attributes remaining escaped when magic_quotes_gpc is on
 
 Version 1.0.1 (November 2011)
 =============
-    * Added MIT license
-    * Content escaping / encoding fixes
-        * <description> no longer uses XML-encoded entities - the content is UTF-8 wrapped in CDATA
-        * <title> is UTF-8 with HTML special characters encoded
-        * <link> / <guid> encode HTML special characters
+* Added MIT license
+* Content escaping / encoding fixes
+    * <description> no longer uses XML-encoded entities - the content is UTF-8 wrapped in CDATA
+    * <title> is UTF-8 with HTML special characters encoded
+    * <link> / <guid> encode HTML special characters
 
 Version 1.0 (September 2011)
 ===========
-    * Initial release
+* Initial release
